@@ -3,19 +3,21 @@ var path = require('path');
 var glob = require('glob');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var PurifyCSSPlugin = require('purifycss-webpack');
+var CleanWebpackPlugin = require('clean-webpack-plugin');
 
 var inProduction = (process.env.NODE_ENV === 'production');
 
 module.exports = {
     entry: {
-        app: [
+        main: [
             './src/main.js',
             './src/main.scss'
-        ]
+        ],
+        vendor: 'jquery'
     },
     output: {
         path: path.resolve(__dirname, './dist'),
-        filename: '[name].js'
+        filename: '[name].[chunkhash].js'
     },
 
     module: {
@@ -70,6 +72,14 @@ module.exports = {
     },
 
     plugins: [
+
+        // Apaga a pasta dist antes de realizar novo build
+        new CleanWebpackPlugin(['dist'], {
+            root: __dirname,
+            verbose: true,
+            dry: false
+        }),
+
         // Extrai texto para app.css
         new ExtractTextPlugin('[name].css'),
 
@@ -83,7 +93,8 @@ module.exports = {
         // Minifica arquivo .css se NODE_ENV production
         new webpack.LoaderOptionsPlugin({
             minimize: inProduction
-        })
+        }),
+
     ]
 }
 
