@@ -1,6 +1,9 @@
 var webpack = require('webpack');
 var path = require('path');
+var glob = require('glob');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var PurifyCSSPlugin = require('purifycss-webpack');
+
 var inProduction = (process.env.NODE_ENV === 'production');
 
 module.exports = {
@@ -69,6 +72,13 @@ module.exports = {
     plugins: [
         // Extrai texto para app.css
         new ExtractTextPlugin('[name].css'),
+
+        // Certifique-se de colocar após o ExtractTextPlugin!
+        new PurifyCSSPlugin({
+        // Passe o diretorio que aplicará a regra, deve ser fixo
+            paths: glob.sync(path.join(__dirname, 'index.html')),
+            minimize: inProduction
+        }),
 
         // Minifica arquivo .css se NODE_ENV production
         new webpack.LoaderOptionsPlugin({
