@@ -37,17 +37,31 @@ module.exports = {
                     //     },
                     //     'sass-loader'
                     // ],
-                     use: ['raw-loader', 'sass-loader'],
+                    use: ['raw-loader', 'sass-loader'],
                     fallback: 'style-loader'
                 })
             },
             {
-                // CArrega todos arquivos dessas extensões para dist/
-                test: /\.(png|je?pg|gif|svg|eot|ttf|woff|woff2)$/,
-                loader: "file-loader",
+                test: /\.(svg|eot|ttf|woff|woff2)$/,
+                loader: 'file-loader',
                 options: {
-                    name: 'images/[name].[hash].[ext]'
+                    name: 'fonts/[name].[ext]'
                 }
+            },
+            {
+                // CArrega todos arquivos dessas extensões para dist/
+                test: /\.(png|je?pg|gif)$/,
+                loaders: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: 'images/[name].[hash].[ext]'
+                        }
+                    },
+
+                    'img-loader'
+
+                ]
             },
             // {
             //     // seleciona todos arquivos com essa extensão .scss ou .sass
@@ -94,6 +108,15 @@ module.exports = {
         new webpack.LoaderOptionsPlugin({
             minimize: inProduction
         }),
+
+        function () {
+            this.plugin('done', stats => {
+                require('fs').writeFileSync(
+                    path.join(__dirname, 'dist/manifest.json'),
+                    JSON.stringify(stats.toJson().assetsByChunkName)
+                );
+            });
+        }
 
     ]
 }

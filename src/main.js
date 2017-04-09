@@ -6,3 +6,4 @@ class Test {
 }
 
 new Test();
+import bg from './images/bg.png'
